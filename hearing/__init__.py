@@ -1,9 +1,12 @@
-import os, sys
+import os
 
-from helper import logger
-from holon import logger
+import helper
 from holon.HolonicAgent import HolonicAgent
 from hearing.microphone import Microphone
+
+
+logger = helper.get_logger()
+
 
 class Hearing(HolonicAgent):
     def __init__(self, cfg):

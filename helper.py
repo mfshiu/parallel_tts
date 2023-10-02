@@ -19,8 +19,8 @@ def get_logger():
     global __log_init
     global logger
     if not __log_init:
-        import guide_config
-        logger = init_logging(log_dir=guide_config.log_dir, log_level=guide_config.log_level)
+        import app_config
+        logger = init_logging(log_dir=app_config.log_dir, log_level=app_config.log_level)
         __log_init = True
         
     return logger

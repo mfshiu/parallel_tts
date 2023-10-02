@@ -6,7 +6,7 @@ import threading
 
 from playsound import playsound
 
-import guide_config
+import app_config
 import helper
 from holon.HolonicAgent import HolonicAgent
 
@@ -22,8 +22,8 @@ class PlayHTVoice(HolonicAgent):
     def __tts(self, text):
         url = "https://play.ht/api/v2/tts"
         headers = {
-            "AUTHORIZATION": f"Bearer {guide_config.playht_secret_key}",
-            "X-USER-ID": f"{guide_config.playht_user_id}",
+            "AUTHORIZATION": f"Bearer {app_config.playht_secret_key}",
+            "X-USER-ID": f"{app_config.playht_user_id}",
             "accept": "text/event-stream",
             "content-type": "application/json",
         }
@@ -70,7 +70,7 @@ class PlayHTVoice(HolonicAgent):
     def __speak(self, voice_url):
         response = requests.get(voice_url)
         temp_filename = dt.now().strftime(f"speak-%m%d-%H%M-%S.mp3")
-        temp_filepath = os.path.join(guide_config.output_dir, temp_filename)
+        temp_filepath = os.path.join(app_config.output_dir, temp_filename)
         logger.debug(f"temp_filepath: {temp_filepath}")
         with open(temp_filepath, "wb") as f:
             f.write(response.content)

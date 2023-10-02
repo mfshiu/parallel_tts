@@ -4,7 +4,7 @@ from datetime import datetime as dt
 from TTS.api import TTS
 
 import helper
-import guide_config
+import app_config
 from holon import logger
 from holon.HolonicAgent import HolonicAgent
 from voice.speaker import Speaker
@@ -34,7 +34,7 @@ class ConquiVoice(HolonicAgent):
         if "voice.text" == topic:
 
             filename = dt.now().strftime(f"speak-%m%d-%H%M-%S.wav")
-            filepath = os.path.join(guide_config.output_dir, filename)
+            filepath = os.path.join(app_config.output_dir, filename)
             logger.debug(f"speak_path:{filepath}")
             try:
                 self.tts.tts_to_file(text=data, file_path=filepath)

@@ -11,7 +11,7 @@ import wave
 
 import helper
 from holon.HolonicAgent import HolonicAgent
-import guide_config
+import app_config
 
 
 logger = helper.get_logger()
@@ -27,7 +27,7 @@ SILENCE_THRESHOLD = (RATE // CHUNK) * 0.28
 
 class Microphone(HolonicAgent):
     def __init__(self, cfg=None):
-        helper.ensure_directory(guide_config.output_dir)
+        helper.ensure_directory(app_config.output_dir)
         self.__set_speaking(False)
         logger.debug(f"Init Microphone done.")
         super().__init__(cfg)
@@ -176,7 +176,7 @@ class Microphone(HolonicAgent):
                     #os.remove(wave_path)
 
                 filename = dt.now().strftime(f"record-%m%d-%H%M-%S.wav")
-                wave_path = os.path.join(guide_config.output_dir, filename)
+                wave_path = os.path.join(app_config.output_dir, filename)
                 threading.Thread(target=write_wave_file, args=(wave_path, b''.join(frames),)).start()
 
         return wave_path

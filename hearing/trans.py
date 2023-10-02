@@ -7,7 +7,7 @@ import time
 import whisper
 import torch
 
-import guide_config
+import app_config
 from holon.HolonicAgent import HolonicAgent
 import helper
 
@@ -17,7 +17,7 @@ logger = helper.get_logger()
 
 class Transcriptionist(HolonicAgent):
     def __init__(self, cfg):
-        helper.ensure_directory(guide_config.input_dir)
+        helper.ensure_directory(app_config.input_dir)
         super().__init__(cfg)
 
 
@@ -30,7 +30,7 @@ class Transcriptionist(HolonicAgent):
     def _on_message(self, client, db, msg):
         if "hearing.voice" == msg.topic:
             filename = dt.now().strftime(f"voice-%m%d-%H%M-%S.wav")
-            wave_path = os.path.join(guide_config.input_dir, filename)
+            wave_path = os.path.join(app_config.input_dir, filename)
             with open(wave_path, "wb") as file:
                 file.write(msg.payload)
             self.wave_queue.put(wave_path)
