@@ -13,7 +13,7 @@ class TtsMain(HolonicAgent):
     def __init__(self, config:AbdiConfig):
         super().__init__(config)
         
-        # self.head_agents.append(Hearing(config))
+        self.head_agents.append(Hearing(config))
         # self.body_agents.append(DialogSystem(config))
         # self.head_agents.append(PlayHTVoice(cfg))
         

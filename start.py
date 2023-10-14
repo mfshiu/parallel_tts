@@ -19,9 +19,7 @@ if __name__ == '__main__':
     logger.info(f'***** Parallel TTS start *****')
 
     def signal_handler(signal, frame):
-        logger.warning("\n***************************")
         logger.warning("* System was interrupted. *")
-        logger.warning("***************************\n")
     signal.signal(signal.SIGINT, signal_handler)
 
     TtsMain(AbdiConfig(options={
