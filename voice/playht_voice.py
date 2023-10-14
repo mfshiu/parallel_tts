@@ -3,6 +3,7 @@ import json
 import os
 import requests
 import threading
+import time
 
 from playsound import playsound
 
@@ -44,6 +45,7 @@ class PlayHTVoice(HolonicAgent):
 
             for line in response.iter_lines(decode_unicode=True):
                 line = line.strip()
+                logger.debug(f"line: {line}")
                 if not line:
                     continue
                 
@@ -71,7 +73,6 @@ class PlayHTVoice(HolonicAgent):
         response = requests.get(voice_url)
         temp_filename = dt.now().strftime(f"speak-%m%d-%H%M-%S.mp3")
         temp_filepath = os.path.join(app_config.output_dir, temp_filename)
-        logger.debug(f"temp_filepath: {temp_filepath}")
         with open(temp_filepath, "wb") as f:
             f.write(response.content)
             
@@ -83,24 +84,27 @@ class PlayHTVoice(HolonicAgent):
         os.remove(temp_filepath)
 
 
-    def _on_connect(self, client, userdata, flags, rc):
-        client.subscribe("voice.text")
-        
-        # Send an empty voice text with false retaintion to clean the retained messages in broker.
-        client.publish("voice.text", payload=None, retain=True)
+    def _on_connect(self):
+        self._subscribe("voice.text")
 
-        super()._on_connect(client, userdata, flags, rc)
+        super()._on_connect()
 
 
     def _on_topic(self, topic, data):
         if "voice.text" == topic and data:
             try:
-                self.publish("voice.speaking")
+                self._publish("voice.speaking")
                 
                 def play_voice():
+                    logger.debug("Start tts")
+                    start_time = time.time()
+                    #
                     voice_url = self.__tts(text=data)
+                    logger.debug(f"Elapsed tts time: {(time.time() - start_time):.4f} seconds")
                     self.__speak(voice_url)
-                    self.publish("voice.spoken")
+                    logger.debug(f"Elapsed speak time: {(time.time() - start_time):.4f} seconds")
+                    
+                    self._publish("voice.spoken")
 
                 threading.Thread(target=play_voice).start()
 

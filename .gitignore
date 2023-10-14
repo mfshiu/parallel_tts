@@ -128,10 +128,10 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-guide_config.py
 _log/
 _input/
 _output/
 _test/
 dialog/nlu/llama/llama-2-7b/
 dialog/nlu/llama/llama-2-7b-chat/
+app_config.py

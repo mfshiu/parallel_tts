@@ -9,9 +9,9 @@ import numpy as np
 import pyaudio
 import wave
 
+import app_config
 import helper
 from holon.HolonicAgent import HolonicAgent
-import app_config
 
 
 logger = helper.get_logger()
@@ -27,10 +27,15 @@ SILENCE_THRESHOLD = (RATE // CHUNK) * 0.28
 
 class Microphone(HolonicAgent):
     def __init__(self, cfg=None):
-        helper.ensure_directory(app_config.output_dir)
+        helper.ensure_directory(cfg.get("output_dir"))
         self.__set_speaking(False)
         logger.debug(f"Init Microphone done.")
         super().__init__(cfg)
+
+
+    # def _run(self, config):
+    #     logger.warning("B"*100)
+    #     super()._run(config)
 
 
     def __set_speaking(self, is_speaking):
@@ -38,15 +43,15 @@ class Microphone(HolonicAgent):
         logger.warning(f"SPEAKING: {self.speaking}")
 
 
-    def _on_connect(self, client, userdata, flags, rc):
-        client.subscribe("voice.speaking")
-        client.subscribe("voice.spoken")
+    def _on_connect(self):
+        self._subscribe("voice.speaking")
+        self._subscribe("voice.spoken")
 
-        super()._on_connect(client, userdata, flags, rc)
+        super()._on_connect()
 
 
     def _on_topic(self, topic, data):
-        logger.debug(f"Got topic: {topic}")
+        # logger.debug(f"Got topic: {topic}")
         
         if "voice.speaking" == topic:
             self.__set_speaking(True)
@@ -74,8 +79,7 @@ class Microphone(HolonicAgent):
         # logger.debug(f"for 60 second... (is speaking: {self.speaking})")
         
         for _ in range(0, int(RATE / CHUNK * 60)):
-            if not self.is_running() or self.speaking:
-                # logger.warning(f"User is speaking, or system is terminating.")
+            if not self._is_running() or self.speaking:
                 first_frames = []
                 break
 
@@ -98,12 +102,14 @@ class Microphone(HolonicAgent):
     
 
     def __record_to_silence(self, audio_stream):
+        logger.debug("Record to silence..")
+
         frames = []
         silence_count = 0
         total_mean = 0
 
         for _ in range(0, int(RATE / CHUNK * MAX_RECORD_SECONDS)):
-            if not self.is_running() or self.speaking:
+            if not self._is_running() or self.speaking:
                 frames = []
                 break
             try:
@@ -156,8 +162,9 @@ class Microphone(HolonicAgent):
         audio.terminate()
 
         wave_path = None
-        if self.is_running() or not self.speaking:
-            if frames and frames_len >= SILENCE_THRESHOLD//2 and frames_mean > 200:
+        # logger.debug(f"self.speaking: {self.speaking}, frames_mean: {frames_mean}")
+        if self._is_running() or not self.speaking:
+            if frames and len(frames) >= SILENCE_THRESHOLD//2: #and frames_mean >= 500:
                 
                 def write_wave_file(wave_path, wave_data):
                     logger.info(f"Write to file: {wave_path}...")
@@ -167,10 +174,7 @@ class Microphone(HolonicAgent):
                     wf.setframerate(RATE)
                     wf.writeframes(b''.join(frames))
                     wf.close()
-                    
-                    topic = "microphone.wave_path"
-                    self.publish(topic, wave_path)                
-                    logger.debug(f"publish: {topic} / {wave_path}")
+                    self._publish("microphone.wave_path", wave_path)                
                     # test
                     #playsound(wave_path)
                     #os.remove(wave_path)
@@ -183,7 +187,7 @@ class Microphone(HolonicAgent):
 
 
     def _running(self):
-        while self.is_running():
+        while self._is_running():
             try:
                 wave_path = self._record()
                 if not wave_path:

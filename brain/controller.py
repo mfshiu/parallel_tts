@@ -1,7 +1,10 @@
 import ast
 
-from holon import logger
+import helper
 from holon.HolonicAgent import HolonicAgent
+
+
+logger = helper.get_logger()
 
 
 class Controller(HolonicAgent):
@@ -11,25 +14,25 @@ class Controller(HolonicAgent):
         self.registered_subjects = []
 
 
-    def _on_connect(self, client, userdata, flags, rc):
-        client.subscribe("dialog.knowledge")
-        client.subscribe("brain.register_subject")
-        client.subscribe("brain.unregister_subject")
-        client.subscribe("brain.subject_done")
-        super()._on_connect(client, userdata, flags, rc)
+    def _on_connect(self):
+        self._subscribe("dialog.knowledge")
+        self._subscribe("brain.register_subject")
+        self._subscribe("brain.unregister_subject")
+        self._subscribe("brain.subject_done")
+        super()._on_connect()
 
 
     def _on_topic(self, topic, data):
         if "dialog.knowledge" == topic:
             if self.active_subject:
-                self.publish(f'{self.active_subject}.knowledge', data)
+                self._publish(f'{self.active_subject}.knowledge', data)
                 # logger.warning(f"Active subject: {self.active_subject}")
             else:
                 knowledge = ast.literal_eval(data)
                 if (subject := knowledge[0][0]) in self.registered_subjects:
                     self.active_subject = subject
                     logger.info(f"Active subject: {self.active_subject}")
-                    self.publish(f'{self.active_subject}.knowledge', data)
+                    self._publish(f'{self.active_subject}.knowledge', data)
                 else:
                     logger.warning(f"Uknown subject: {subject}")
         elif "brain.register_subject" == topic:

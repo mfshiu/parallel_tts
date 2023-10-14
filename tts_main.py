@@ -3,7 +3,9 @@ from holon.HolonicAgent import HolonicAgent
 from abdi_config import AbdiConfig
 from hearing import Hearing
 import helper
+from brain import Brain
 from dialog import DialogSystem
+from voice.playht_voice import PlayHTVoice
 
 
 logger = helper.get_logger()
@@ -13,9 +15,10 @@ class TtsMain(HolonicAgent):
     def __init__(self, config:AbdiConfig):
         super().__init__(config)
         
+        self.head_agents.append(Brain(config))
         self.head_agents.append(Hearing(config))
-        # self.body_agents.append(DialogSystem(config))
-        # self.head_agents.append(PlayHTVoice(cfg))
+        self.body_agents.append(DialogSystem(config))
+        self.head_agents.append(PlayHTVoice(config))
         
         logger.debug(f"Init TtsMain done.")
 

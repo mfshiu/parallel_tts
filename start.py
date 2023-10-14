@@ -29,4 +29,9 @@ if __name__ == '__main__':
         "keepalive": app_config.mqtt_keepalive,
         "username": app_config.mqtt_username,
         "password": app_config.mqtt_password,
+
+        "input_dir": app_config.input_dir,
+        "output_dir": app_config.output_dir,
+        "playht_user_id": app_config.playht_user_id,
+        "playht_secret_key": app_config.playht_secret_key,
     })).start()
