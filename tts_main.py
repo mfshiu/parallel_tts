@@ -5,7 +5,8 @@ from hearing import Hearing
 import helper
 from brain import Brain
 from dialog import DialogSystem
-from voice.playht_voice import PlayHTVoice
+# from voice.playht_voice import PlayHTVoice
+from voice.playht_voice_v1 import PlayHTVoiceV1
 
 
 logger = helper.get_logger()
@@ -18,7 +19,7 @@ class TtsMain(HolonicAgent):
         self.head_agents.append(Brain(config))
         self.head_agents.append(Hearing(config))
         self.body_agents.append(DialogSystem(config))
-        self.head_agents.append(PlayHTVoice(config))
+        self.head_agents.append(PlayHTVoiceV1(config))
         
         logger.debug(f"Init TtsMain done.")
 

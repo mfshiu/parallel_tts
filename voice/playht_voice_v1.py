@@ -15,55 +15,30 @@ from holon.HolonicAgent import HolonicAgent
 logger = helper.get_logger()
 
 
-class PlayHTVoice(HolonicAgent):
+class PlayHTVoiceV1(HolonicAgent):
     def __init__(self, cfg):
         super().__init__(cfg)
 
 
     def __tts(self, text):
-        url = "https://play.ht/api/v2/tts"
-        headers = {
-            "AUTHORIZATION": f"Bearer {app_config.playht_secret_key}",
-            "X-USER-ID": f"{app_config.playht_user_id}",
-            "accept": "text/event-stream",
-            "content-type": "application/json",
+        url = "https://api.play.ht/api/v1/convert"
+        payload = {
+            "content": [text],
+            "voice": "cmn-TW-Wavenet-B"
         }
-        data = {
-            "text": text,
-            # "voice": "larry",
-            "voice": "Jennifer",
-            "quality": "premium",
-            "output_format": "mp3",
-            "speed": 1,
-            "sample_rate": 24000
+        headers = {
+            "accept": "application/json",
+            "content-type": "application/json",
+            "AUTHORIZATION": f"{app_config.playht_secret_key}", #"25c86565a13e41e6baba3979c8f90c5a",
+            "X-USER-ID": f"{app_config.playht_user_id}", #"RAE0rqSL3GRV3xgSEj4l33BTVC23"
         }
 
         voice_url = None
-        response = requests.post(url, headers=headers, json=data, stream=True)
-        if response.status_code == 200:
-            event = None
-            data = None
-
-            for line in response.iter_lines(decode_unicode=True):
-                line = line.strip()
-                logger.debug(f"line: {line}")
-                if not line:
-                    continue
-                
-                key, value = tuple([pair.strip() for pair in line.split(":", 1)])
-                if key == "event":
-                    event = value
-                elif key == "data":
-                    try:
-                        data = json.loads(value)
-                    except Exception as ex:
-                        logger.error(ex)
-
-                if event and data:
-                    if event == "completed":
-                        voice_url = data["url"]
-                    event = None
-                    data = None
+        response = requests.post(url, json=payload, headers=headers)
+        if response.status_code == 200 or response.status_code == 201:
+            resp = json.loads(response.text)
+            logger.debug(f"resp: {resp}")
+            voice_url = f"https://play.ht/api/v1/articleStatus?transcriptionId={resp.transcriptionId}"
         else:
             logger.error(f"Request failed with status code: {response.status_code}")
 
@@ -101,9 +76,9 @@ class PlayHTVoice(HolonicAgent):
                     #
                     voice_url = self.__tts(text=data)
                     if voice_url:
-                        logger.debug(f"Elapsed tts time: {(time.time() - start_time):.4f} seconds")
+                        # logger.debug(f"Elapsed tts time: {(time.time() - start_time):.4f} seconds")
                         self.__speak(voice_url)
-                        logger.debug(f"Elapsed speak time: {(time.time() - start_time):.4f} seconds")
+                        # logger.debug(f"Elapsed speak time: {(time.time() - start_time):.4f} seconds")
                     else:
                         logger.error(f"Cannot get voice url.")
                     

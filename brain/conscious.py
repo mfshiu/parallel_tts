@@ -28,7 +28,8 @@ class Conscious(HolonicAgent):
         if not self._init:
             self._init = True
             time.sleep(3)
-            brain_helper.speak(self, "Good morning, Mr. Zhang. It's a sunny day today, perfect for a walk! How did you sleep last night?")
+            # brain_helper.speak(self, "Good morning, Mr. Zhang. It's a sunny day today, perfect for a walk! How did you sleep last night?")
+            brain_helper.speak(self, "早上好，張先生。今天天氣晴，適合散步呢！您今天睡得怎麼樣？")
             # time.sleep(20)
             # self._init = False
         
