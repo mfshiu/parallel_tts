@@ -10,6 +10,7 @@ from playsound import playsound
 import app_config
 import helper
 from holon.HolonicAgent import HolonicAgent
+from voice.speaker import Speaker
 
 
 logger = helper.get_logger()
@@ -18,13 +19,16 @@ logger = helper.get_logger()
 class PlayHTVoiceV1(HolonicAgent):
     def __init__(self, cfg):
         super().__init__(cfg)
+        # self.head_agents.append(Speaker(cfg))
 
 
     def __tts(self, text):
         url = "https://api.play.ht/api/v1/convert"
         payload = {
             "content": [text],
-            "voice": "cmn-TW-Wavenet-B"
+            # "voice": "cmn-TW-Wavenet-B"
+            "voice": "zh-CN-YunyeNeural",
+            "narrationStyle": "sad"
         }
         headers = {
             "accept": "application/json",
@@ -38,7 +42,23 @@ class PlayHTVoiceV1(HolonicAgent):
         if response.status_code == 200 or response.status_code == 201:
             resp = json.loads(response.text)
             logger.debug(f"resp: {resp}")
-            voice_url = f"https://play.ht/api/v1/articleStatus?transcriptionId={resp.transcriptionId}"
+            get_voice_url = f"https://play.ht/api/v1/articleStatus?transcriptionId={resp['transcriptionId']}"
+            # get_headers = {
+            #     "accept": "application/json",
+            #     "content-type": "application/json",
+            #     "AUTHORIZATION": f"{app_config.playht_secret_key}", #"25c86565a13e41e6baba3979c8f90c5a",
+            #     "X-USER-ID": f"{app_config.playht_user_id}", #"RAE0rqSL3GRV3xgSEj4l33BTVC23"
+            # }
+            response = requests.get(get_voice_url, headers=headers)
+            resp = json.loads(response.text)
+            logger.debug(f"resp2: {resp}")
+            while not resp["converted"]:
+                time.sleep(.1)
+                response = requests.get(get_voice_url, headers=headers)
+                resp = json.loads(response.text)
+                logger.debug(f"resp2: {resp}")
+            voice_url = resp["audioUrl"]
+            logger.debug(f"voice_url: {voice_url}")
         else:
             logger.error(f"Request failed with status code: {response.status_code}")
 
@@ -49,14 +69,16 @@ class PlayHTVoiceV1(HolonicAgent):
         try:
             response = requests.get(voice_url)
             temp_filename = dt.now().strftime(f"speak-%m%d-%H%M-%S.mp3")
-            temp_filepath = os.path.join(app_config.output_dir, temp_filename)
-            with open(temp_filepath, "wb") as f:
+            voice_filepath = f"{app_config.output_dir}/{temp_filename}"
+            with open(voice_filepath, "wb") as f:
                 f.write(response.content)
-            playsound(temp_filepath)
-        except Exception as ex:
-            logger.exception(ex)
+            voice_filepath = os.path.abspath(voice_filepath).replace('\\', '/')
+            logger.debug(f"voice_filepath: {voice_filepath}")
+            playsound(voice_filepath)
+            os.remove(voice_filepath)
             
-        os.remove(temp_filepath)
+        except Exception as ex:
+            logger.exception(ex)           
 
 
     def _on_connect(self):
@@ -72,7 +94,7 @@ class PlayHTVoiceV1(HolonicAgent):
                 
                 def play_voice():
                     logger.debug("Start tts")
-                    start_time = time.time()
+                    # start_time = time.time()
                     #
                     voice_url = self.__tts(text=data)
                     if voice_url:
@@ -85,6 +107,7 @@ class PlayHTVoiceV1(HolonicAgent):
                     self._publish("voice.spoken")
 
                 threading.Thread(target=play_voice).start()
+                # play_voice()
 
             except Exception as ex:
                 logger.error(ex)

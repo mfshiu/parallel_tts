@@ -13,12 +13,14 @@ from voice.playht_voice_v1 import PlayHTVoiceV1
 logger = helper.get_logger()
 
 
-class TtsMain(HolonicAgent):
+class HolaDialog(HolonicAgent):
     def __init__(self, config:AbdiConfig):
         super().__init__(config)
         
+        self.head_agents.append(Brain(config))
         self.head_agents.append(Hearing(config))
-        self.body_agents.append(Merger(config))
+        self.body_agents.append(DialogSystem(config))
+        self.head_agents.append(PlayHTVoiceV1(config))
         
         logger.debug(f"Init TtsMain done.")
 

@@ -63,7 +63,7 @@ class Transcriptionist(HolonicAgent):
                 logger.debug(f'transcribe path:{wave_path}')
                 result = self.whisper_model.transcribe(wave_path)
                 transcribed_text = result["text"]
-                self.publish("hearing.trans.text", transcribed_text)        
+                self._publish("hearing.trans.text", transcribed_text)        
                 logger.info(f">>> \033[33m{transcribed_text}\033[0m")
                 if os.path.exists(wave_path):
                     os.remove(wave_path)

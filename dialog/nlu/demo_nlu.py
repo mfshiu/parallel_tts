@@ -45,6 +45,6 @@ class DemoNlu(HolonicAgent):
         elif "exercises" in prompt or "運動" in prompt:
             _classification = ("demo", "5")
         else:
-            _classification = ("demo", "1")
+            _classification = ("demo", "0")
 
         return _classification, None, (prompt, last_sentence)

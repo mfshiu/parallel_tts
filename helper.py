@@ -65,3 +65,36 @@ def remove_emojis(text):
                            "]+", flags=re.UNICODE)
     
     return emoji_pattern.sub(r'', text)
+
+
+
+
+from collections import deque
+
+
+class CircularQueue:
+    def __init__(self, size):
+        self.size = size
+        self.queue = deque(maxlen=size)
+
+    def enqueue(self, item):
+        self.queue.append(item)
+
+    def dequeue(self):
+        if not self.is_empty():
+            return self.queue.popleft()
+        return None
+
+    def is_empty(self):
+        return len(self.queue) == 0
+
+    def is_full(self):
+        return len(self.queue) == self.size
+
+    def peek(self):
+        if not self.is_empty():
+            return self.queue[0]
+        return None
+
+    def __str__(self):
+        return str(list(self.queue))
