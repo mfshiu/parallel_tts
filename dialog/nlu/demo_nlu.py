@@ -10,7 +10,7 @@ from holon.HolonicAgent import HolonicAgent
 
 
 logger = helper.get_logger()
-openai.api_key = os.environ['OPENAI_API_KEY']
+openai.api_key = os.environ.get('OPENAI_API_KEY')
 
 
 class DemoNlu(HolonicAgent):

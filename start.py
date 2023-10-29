@@ -32,6 +32,7 @@ if __name__ == '__main__':
 
         "input_dir": app_config.input_dir,
         "output_dir": app_config.output_dir,
+        "openai_api_key": app_config.openai_api_key,
         "playht_user_id": app_config.playht_user_id,
         "playht_secret_key": app_config.playht_secret_key,
     })).start()
