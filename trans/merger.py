@@ -35,11 +35,14 @@ class Merger(HolonicAgent):
         logger.debug(f"medium_text: {medium_text}")
         logger.debug(f"raw_text: {raw_text}")
         
-        system_message = f"""You will receive three ordered sentences from a user.
-Please connect the sentences in order to form a complete sentence.
-Don’t make any changes to the first sentence.
-The order of the sentences cannot be changed
-Only respond with the new sentence and do not provide any explanations."""
+#         system_message = f"""You will receive three ordered sentences from a user.
+# Please connect the sentences in order to form a complete sentence.
+# Don’t make any changes to the first sentence.
+# The order of the sentences cannot be changed.
+# Only respond with the new sentence and do not provide any explanations."""
+        system_message = f"""Receive three ordered sentences from a user,
+connect them in order to form a complete sentence without altering the first sentence or changing their order. 
+Respond only with the new sentence and provide no explanations."""
         messages =  [  
             {'role':'system', 'content': system_message},    
             {'role':'user', 'content': f"1. {merged_text}\n2. {medium_text}\n3. {raw_text}"}]
