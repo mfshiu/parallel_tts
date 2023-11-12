@@ -50,15 +50,11 @@ class Microphone(HolonicAgent):
         super()._on_connect()
 
 
-    def _on_topic(self, topic, data):
-        # logger.debug(f"Got topic: {topic}")
-        
+    def _on_message(self, topic:str, payload):
         if "voice.speaking" == topic:
             self.__set_speaking(True)
         elif "voice.spoken" == topic:
             self.__set_speaking(False)
-
-        super()._on_topic(topic, data)
 
 
     def __compute_frames_mean(frames):

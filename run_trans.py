@@ -4,7 +4,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 import multiprocessing
 import signal
 
-from holon import config
+from abdi_config import AbdiConfig
 import app_config
 from hearing.trans import Transcriptionist
 import helper
@@ -14,6 +14,29 @@ logger = helper.get_logger()
 
 
 if __name__ == '__main__':
+    logger.info(f'***** RunTrans start *****')
+
+    def signal_handler(signal, frame):
+        logger.warning("* System was interrupted. *")
+    signal.signal(signal.SIGINT, signal_handler)
+
+    Transcriptionist(AbdiConfig(options={
+        "broker_type": app_config.broker_type,
+        "host": app_config.mqtt_address,
+        "port": app_config.mqtt_port,
+        "keepalive": app_config.mqtt_keepalive,
+        "username": app_config.mqtt_username,
+        "password": app_config.mqtt_password,
+
+        "input_dir": app_config.input_dir,
+        "output_dir": app_config.output_dir,
+        "openai_api_key": app_config.openai_api_key,
+        "playht_user_id": app_config.playht_user_id,
+        "playht_secret_key": app_config.playht_secret_key,
+    })).start()
+
+
+if __name__ == 'x__main__':
     print('***** RunTrans start *****')
 
     def signal_handler(signal, frame):

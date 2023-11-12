@@ -34,6 +34,7 @@ class Merger(HolonicAgent):
         logger.debug(f"merged_text: {merged_text}")
         logger.debug(f"medium_text: {medium_text}")
         logger.debug(f"raw_text: {raw_text}")
+        logger.debug(f"Connecting by ChatGPT...")
         
 #         system_message = f"""You will receive three ordered sentences from a user.
 # Please connect the sentences in order to form a complete sentence.
@@ -59,10 +60,11 @@ Respond only with the new sentence and provide no explanations."""
         return content
 
 
-    def _on_topic(self, topic, data):
+    def _on_message(self, topic:str, payload):
         if "hearing.trans.text" == topic:
             logger.debug("="*20)
-            raw_text = data.strip()
+            data = self._convert_to_text(payload)
+            raw_text = data.strip() if data else ""
             if not self._medium_text:
                 self._medium_text = raw_text
             elif not raw_text:
@@ -75,7 +77,11 @@ Respond only with the new sentence and provide no explanations."""
                 else:
                     merged_text_0 = ""
                     merged_text_1 = self._merged_text
-                completed_text = self.__connect_fragments(merged_text_1, self._medium_text, raw_text)
+                    
+                completed_text = self.__connect_fragments(
+                    merged_text=merged_text_1, 
+                    medium_text=self._medium_text, 
+                    raw_text=raw_text)
                 logger.debug(f"completed_text: {completed_text}")
                 
                 len_merged_text = len(merged_text_1)
@@ -87,8 +93,6 @@ Respond only with the new sentence and provide no explanations."""
                 
             logger.debug(f"self._merged_text: {self._merged_text}")
             logger.debug(f"self._medium_text: {self._medium_text}")
-
-        super()._on_topic(topic, data)
 
 
 # if __name__ == '__main__':

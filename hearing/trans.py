@@ -21,18 +21,17 @@ class Transcriptionist(HolonicAgent):
         super().__init__(cfg)
 
 
-    def _on_connect(self, client, userdata, flags, rc):
-        client.subscribe("hearing.voice")
+    def _on_connect(self):
+        self._subscribe("hearing.voice")
+        super()._on_connect()
 
-        super()._on_connect(client, userdata, flags, rc)
 
-
-    def _on_message(self, client, db, msg):
-        if "hearing.voice" == msg.topic:
+    def _on_message(self, topic:str, payload):
+        if "hearing.voice" == topic:
             filename = dt.now().strftime(f"voice-%m%d-%H%M-%S.wav")
             wave_path = os.path.join(app_config.input_dir, filename)
             with open(wave_path, "wb") as file:
-                file.write(msg.payload)
+                file.write(payload)
             self.wave_queue.put(wave_path)
 
 
@@ -54,7 +53,7 @@ class Transcriptionist(HolonicAgent):
 
 
     def _running(self):
-        while self.is_running():
+        while self._is_running():
             if self.wave_queue.empty():
                 time.sleep(.1)
                 continue

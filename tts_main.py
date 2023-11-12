@@ -29,9 +29,9 @@ class TtsMain(HolonicAgent):
         super()._on_connect()
 
 
-    def _on_topic(self, topic, data):
-        if "parallel/hearing/heared" == topic:
-            if '系統關機' in data:
-                self.terminate()
+    # def _on_topic(self, topic, data):
+    #     if "parallel/hearing/heared" == topic:
+    #         if '系統關機' in data:
+    #             self.terminate()
 
-        super()._on_topic(topic, data)
+    #     super()._on_topic(topic, data)
