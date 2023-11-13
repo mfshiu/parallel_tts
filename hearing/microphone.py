@@ -140,9 +140,11 @@ class Microphone(HolonicAgent):
 
     def _record(self):
         audio = pyaudio.PyAudio()
+        logger.debug("A-1")
         audio_stream = audio.open(format=FORMAT, channels=CHANNELS,
                             rate=RATE, input=True,
                             frames_per_buffer=CHUNK)
+        logger.debug("A-2")
         
         frames = self.__wait_voice(audio_stream)
         frames_mean = 0

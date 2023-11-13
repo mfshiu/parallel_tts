@@ -2,7 +2,8 @@ import os
 
 import helper
 from holon.HolonicAgent import HolonicAgent
-from hearing.microphone import Microphone
+# from hearing.microphone import Microphone
+from hearing.microphone3 import Microphone3 as Microphone
 
 
 logger = helper.get_logger()

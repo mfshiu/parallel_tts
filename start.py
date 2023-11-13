@@ -3,6 +3,7 @@
 import os, sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
+import multiprocessing
 import signal
 
 from abdi_config import AbdiConfig
@@ -21,6 +22,8 @@ if __name__ == '__main__':
     def signal_handler(signal, frame):
         logger.warning("* System was interrupted. *")
     signal.signal(signal.SIGINT, signal_handler)
+
+    multiprocessing.set_start_method('spawn')
 
     TtsMain(AbdiConfig(options={
         "broker_type": app_config.broker_type,
